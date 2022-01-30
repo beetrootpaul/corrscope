@@ -1,9 +1,9 @@
 from typing import TYPE_CHECKING, List, Callable
 
-from PyQt5 import QtWidgets as qw, QtCore as qc
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QShortcut
+from PyQt6 import QtWidgets as qw, QtCore as qc
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QKeySequence
+from PyQt6.QtWidgets import QShortcut
 
 from corrscope.gui.util import find_ranges
 

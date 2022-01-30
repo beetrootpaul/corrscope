@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
+from PyQt6.QtCore import *
+from PyQt6.QtWidgets import *
 
 from corrscope.gui.view_stack import (
     LayoutStack,
