@@ -4,7 +4,7 @@ from operator import itemgetter
 from typing import TypeVar, Iterable, Generic, Tuple, Any, Optional
 
 import matplotlib.colors
-from PyQt6.QtCore import QMutex
+from PyQt6.QtCore import QRecursiveMutex
 from PyQt6.QtWidgets import QErrorMessage, QWidget
 
 from corrscope.config import CorrError
@@ -31,7 +31,7 @@ class Locked(Generic[T]):
     def __init__(self, obj: T):
         super().__init__()
         self.obj = obj
-        self.lock = QMutex(QMutex.Recursive)
+        self.lock = QRecursiveMutex()
 
     def __enter__(self) -> T:
         self.lock.lock()

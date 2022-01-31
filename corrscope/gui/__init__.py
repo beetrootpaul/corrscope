@@ -296,7 +296,7 @@ class MainWindow(qw.QMainWindow, Ui_MainWindow):
         )
         response = Msg.question(self, title, message, Msg.Yes | Msg.No, Msg.No)
 
-        if response == Msg.Yes:
+        if response == Msg.StandardButton.Yes:
             # Closing ffplay preview (can't cancel render, the dialog is untouchable)
             # will set self.corr_thread to None while the dialog is active.
             # https://www.vikingsoftware.com/how-to-use-qthread-properly/ # QObject thread affinity
@@ -319,12 +319,17 @@ class MainWindow(qw.QMainWindow, Ui_MainWindow):
 
         message = f"Save changes to {self.title_cache}?"
         should_close = Msg.question(
-            self, title, message, Msg.Save | Msg.Discard | Msg.Cancel
+            self,
+            title,
+            message,
+            Msg.StandardButton.Save
+            | Msg.StandardButton.Discard
+            | Msg.StandardButton.Cancel,
         )
 
-        if should_close == Msg.Cancel:
+        if should_close == Msg.StandardButton.Cancel:
             return False
-        elif should_close == Msg.Discard:
+        elif should_close == Msg.StandardButton.Discard:
             return True
         else:
             return self.on_action_save()
@@ -578,7 +583,7 @@ class MainWindow(qw.QMainWindow, Ui_MainWindow):
         if dlg:
             # t.abort -> Locked.set() is thread-safe (hopefully).
             # It can be called from main thread (not just within CorrThread).
-            dlg.canceled.connect(t.abort, Qt.DirectConnection)
+            dlg.canceled.connect(t.abort, Qt.ConnectionType.DirectConnection)
             t.arg = attr.evolve(
                 arg,
                 on_begin=run_on_ui_thread(dlg.on_begin, (float, float)),
@@ -795,7 +800,7 @@ def run_on_ui_thread(
     # Qt::ConnectionType type,
     # QGenericReturnArgument ret,
     # https://riverbankcomputing.com/pipermail/pyqt/2014-December/035223.html
-    conn = Qt.QueuedConnection
+    conn = Qt.ConnectionType.QueuedConnection
 
     @functools.wraps(bound_slot)
     def inner(*args):
@@ -803,7 +808,7 @@ def run_on_ui_thread(
             raise TypeError(f"len(types)={len(types)} != len(args)={len(args)}")
 
         # https://www.qtcentre.org/threads/29156-Calling-a-slot-from-another-thread?p=137140#post137140
-        # QMetaObject.invokeMethod(skypeThread, "startSkypeCall", Qt.QueuedConnection, QtCore.Q_ARG("QString", "someguy"))
+        # QMetaObject.invokeMethod(skypeThread, "startSkypeCall", Qt.ConnectionType.QueuedConnection, QtCore.Q_ARG("QString", "someguy"))
 
         _args = [qc.Q_ARG(typ, typ(arg)) for typ, arg in zip(types, args)]
         return qmo.invokeMethod(obj, member, conn, *_args)
@@ -1265,11 +1270,11 @@ class ChannelModel(qc.QAbstractTableModel):
 
     def flags(self, index: QModelIndex):
         if not index.isValid():
-            return Qt.ItemIsEnabled
+            return Qt.ItemFlag.ItemIsEnabled
         return (
             qc.QAbstractItemModel.flags(self, index)
-            | Qt.ItemIsEditable
-            | Qt.ItemNeverHasChildren
+            | Qt.ItemFlag.ItemIsEditable
+            | Qt.ItemFlag.ItemNeverHasChildren
         )
 
 
@@ -1296,7 +1301,9 @@ class DownloadFFmpegActivity:
         Msg = qw.QMessageBox
 
         if not self.can_download:
-            Msg.information(window, self.title, self.fail_template, Msg.Ok)
+            Msg.information(
+                window, self.title, self.fail_template, Msg.StandardButton.Ok
+            )
             return
 
-        Msg.information(window, self.title, self.ffmpeg_template, Msg.Ok)
+        Msg.information(window, self.title, self.ffmpeg_template, Msg.StandardButton.Ok)
