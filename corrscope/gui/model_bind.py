@@ -172,11 +172,11 @@ class BoundWidget(QWidget):
         """Palette with red background, used for widgets with invalid input."""
         error_palette = QPalette(self.palette())
 
-        bg = error_palette.color(QPalette.Base)
-        red = QColor(qc.Qt.red)
+        bg = error_palette.color(QPalette.ColorRole.Base)
+        red = QColor(qc.Qt.GlobalColor.red)
 
         red_bg = blend_colors(bg, red, 0.5)
-        error_palette.setColor(QPalette.Base, red_bg)
+        error_palette.setColor(QPalette.ColorRole.Base, red_bg)
         return error_palette
 
     # My class/method naming scheme is inconsistent and unintuitive.

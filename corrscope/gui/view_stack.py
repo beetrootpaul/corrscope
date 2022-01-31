@@ -201,7 +201,7 @@ def append_menu(stack: LayoutStack, **kwargs):
     return _new_widget(stack, QMenu, exit_action="addMenu", **kwargs)
 
 
-def add_toolbar(stack: LayoutStack, area=Qt.TopToolBarArea):
+def add_toolbar(stack: LayoutStack, area=Qt.ToolBarArea.TopToolBarArea):
     assert_peek(stack, QMainWindow)
 
     def _add_toolbar(parent: QMainWindow, toolbar):

@@ -10,6 +10,7 @@ from typing import Optional, List, Any, Tuple, Callable, Union, Dict, Sequence, 
 
 import PyQt6.QtCore as qc
 import PyQt6.QtWidgets as qw
+import PyQt6.QtGui as qg
 import attr
 from PyQt6.QtCore import QModelIndex, Qt, QVariant
 from PyQt6.QtGui import QFont, QCloseEvent, QDesktopServices
@@ -83,7 +84,6 @@ def gui_main(cfg_or_path: Union[Config, Path]):
 
     # qw.QApplication.setStyle('fusion')
     QApp = qw.QApplication
-    QApp.setAttribute(qc.Qt.AA_EnableHighDpiScaling)
 
     app = qw.QApplication(sys.argv)
 
@@ -100,7 +100,7 @@ def gui_main(cfg_or_path: Union[Config, Path]):
     # Any exceptions raised within MainWindow() will be caught within exec_.
     # exception_as_dialog() turns it into a Qt dialog.
     with exception_as_dialog(window):
-        ret = app.exec_()
+        ret = app.exec()
         # Any exceptions raised after exec_ terminates will call
         # exception_as_dialog().__exit__ before being caught.
         # This produces a Python traceback.
@@ -425,18 +425,18 @@ class MainWindow(qw.QMainWindow, Ui_MainWindow):
     channelUp: "ShortcutButton"
     channelDown: "ShortcutButton"
 
-    action_separate_render_dir: qw.QAction
-    action_open_config_dir: qw.QAction
+    action_separate_render_dir: qg.QAction
+    action_open_config_dir: qg.QAction
 
     # Loading mainwindow.ui changes menuBar from a getter to an attribute.
     menuBar: qw.QMenuBar
-    actionNew: qw.QAction
-    actionOpen: qw.QAction
-    actionSave: qw.QAction
-    actionSaveAs: qw.QAction
-    actionPreview: qw.QAction
-    actionRender: qw.QAction
-    actionExit: qw.QAction
+    actionNew: qg.QAction
+    actionOpen: qg.QAction
+    actionSave: qg.QAction
+    actionSaveAs: qg.QAction
+    actionPreview: qg.QAction
+    actionRender: qg.QAction
+    actionExit: qg.QAction
 
     def on_master_audio_browse(self):
         name = get_open_file_name(
@@ -955,7 +955,7 @@ class ConfigModel(PresentationModel):
     @safe_property
     def render__label_qfont(self) -> QFont:
         qfont = QFont()
-        qfont.setStyleHint(QFont.SansSerif)  # no-op on X11
+        qfont.setStyleHint(QFont.StyleHint.SansSerif)  # no-op on X11
 
         font = self.cfg.render.label_font
         if font.toString:
@@ -1112,10 +1112,13 @@ class ChannelModel(qc.QAbstractTableModel):
         return len(self.col_data)
 
     def headerData(
-        self, section: int, orientation: Qt.Orientation, role: int = Qt.DisplayRole
+        self,
+        section: int,
+        orientation: Qt.Orientation,
+        role: int = Qt.ItemDataRole.DisplayRole,
     ) -> Union[str, QVariant]:
-        if role == Qt.DisplayRole:
-            if orientation == Qt.Horizontal:
+        if role == Qt.ItemDataRole.DisplayRole:
+            if orientation == Qt.Orientation.Horizontal:
                 col = section
                 try:
                     return self.col_data[col].display_name
@@ -1132,12 +1135,12 @@ class ChannelModel(qc.QAbstractTableModel):
     # data
     TRIGGER = "trigger__"
 
-    def data(self, index: QModelIndex, role=Qt.DisplayRole) -> Any:
+    def data(self, index: QModelIndex, role=Qt.ItemDataRole.DisplayRole) -> Any:
         col = index.column()
         row = index.row()
 
         if (
-            role in [Qt.DisplayRole, Qt.EditRole]
+            role in [Qt.ItemDataRole.DisplayRole, Qt.ItemDataRole.EditRole]
             and index.isValid()
             and row < self.rowCount()
         ):
@@ -1152,18 +1155,20 @@ class ChannelModel(qc.QAbstractTableModel):
 
             if value == data.default:
                 return ""
-            if key == "wav_path" and role == Qt.DisplayRole:
+            if key == "wav_path" and role == Qt.ItemDataRole.DisplayRole:
                 if Path(value).parent != Path():
                     return "..." + Path(value).name
             return str(value)
 
         return nope
 
-    def setData(self, index: QModelIndex, value: str, role=Qt.EditRole) -> bool:
+    def setData(
+        self, index: QModelIndex, value: str, role=Qt.ItemDataRole.EditRole
+    ) -> bool:
         col = index.column()
         row = index.row()
 
-        if index.isValid() and role == Qt.EditRole:
+        if index.isValid() and role == Qt.ItemDataRole.EditRole:
             # type(value) == str
 
             data = self.col_data[col]
