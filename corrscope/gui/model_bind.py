@@ -292,10 +292,14 @@ class BoundCheckBox(qw.QCheckBox, BoundWidget):
     # gui_changed -> set_model(Qt.CheckState).
     @pyqtSlot(CheckState)
     def set_model(self, value: CheckState):
-        """Qt.PartiallyChecked probably should not happen."""
+        """Qt.CheckState.PartiallyChecked probably should not happen."""
         Qt = qc.Qt
-        assert value in [Qt.Unchecked, Qt.PartiallyChecked, Qt.Checked]
-        self.set_bool(value != Qt.Unchecked)
+        assert value in [
+            Qt.CheckState.Unchecked.value,
+            Qt.CheckState.PartiallyChecked.value,
+            Qt.CheckState.Checked.value,
+        ]
+        self.set_bool(value != Qt.CheckState.Unchecked.value)
 
     set_bool = model_setter(bool)
 
@@ -578,10 +582,14 @@ class _ColorCheckBox(qw.QCheckBox):
 
     @pyqtSlot(CheckState)
     def on_check(self, value: CheckState):
-        """Qt.PartiallyChecked probably should not happen."""
+        """Qt.CheckState.PartiallyChecked probably should not happen."""
         Qt = qc.Qt
-        assert value in [Qt.Unchecked, Qt.PartiallyChecked, Qt.Checked]
-        if value != Qt.Unchecked:
+        assert value in [
+            Qt.CheckState.Unchecked.value,
+            Qt.CheckState.PartiallyChecked.value,
+            Qt.CheckState.Checked.value,
+        ]
+        if value != Qt.CheckState.Unchecked.value:
             self.color_text.setText("#ffffff")
         else:
             self.color_text.setText("")
