@@ -9,11 +9,10 @@ from typing import Iterator, Optional, List, Callable
 
 import attr
 
-from corrscope import outputs as outputs_
 from corrscope.channel import Channel, ChannelConfig, DefaultLabel
 from corrscope.config import KeywordAttrs, DumpEnumAsStr, CorrError, with_units
 from corrscope.layout import LayoutConfig
-from corrscope.outputs import FFmpegOutputConfig, IOutputConfig
+from corrscope.outputs import FFmpegOutputConfig, IOutputConfig, Stop, Output
 from corrscope.renderer import Renderer, RendererConfig, RendererFrontend, RenderInput
 from corrscope.triggers import (
     CorrelationTriggerConfig,
@@ -145,7 +144,7 @@ IsAborted = Callable[[], bool]
 @attr.dataclass
 class Arguments:
     cfg_dir: str
-    outputs: List[outputs_.IOutputConfig]
+    outputs: List[IOutputConfig]
 
     on_begin: BeginFunc = lambda begin_time, end_time: None
     progress: ProgressFunc = print
@@ -179,7 +178,7 @@ class CorrScope:
         # Check for ffmpeg video recording, then mutate cfg.
         is_record = False
         for output in self.output_cfgs:
-            if isinstance(output, outputs_.FFmpegOutputConfig):
+            if isinstance(output, FFmpegOutputConfig):
                 is_record = True
                 break
         if is_record:
@@ -190,7 +189,7 @@ class CorrScope:
     trigger_waves: List[Wave]
     render_waves: List[Wave]
     channels: List[Channel]
-    outputs: List[outputs_.Output]
+    outputs: List[Output]
     nchan: int
 
     def _load_channels(self) -> None:
@@ -327,7 +326,7 @@ class CorrScope:
                         # Output frame
                         aborted = False
                         for output in self.outputs:
-                            if output.write_frame(frame_data) is outputs_.Stop:
+                            if output.write_frame(frame_data) is Stop:
                                 aborted = True
                                 break
                         if aborted:
