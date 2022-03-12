@@ -1025,6 +1025,7 @@ class Column:
         return self.key.replace("__", "\n").replace("_", " ").title()
 
     display_name: str = attr.Factory(_display_name, takes_self=True)
+    always_show: bool = False
 
 
 def plus_minus_one(value: str) -> int:
@@ -1097,8 +1098,8 @@ class ChannelModel(qc.QAbstractTableModel):
         Column("line_color", str, None, "Line Color"),
         Column("color_by_pitch", parse_bool_maybe, None, "Color Lines\nBy Pitch"),
         Column("render_stereo", str, None, "Render Stereo\nDownmix"),
-        Column("trigger_width", int, None, "Trigger Width ×"),
-        Column("render_width", int, None, "Render Width ×"),
+        Column("trigger_width", int, 1, "Trigger Width ×", always_show=True),
+        Column("render_width", int, 1, "Render Width ×", always_show=True),
         Column("trigger__sign_strength", float, None),
         Column("trigger__buffer_strength", float, None),
         Column("trigger__responsiveness", float, None, "Buffer\nResponsiveness"),
@@ -1158,7 +1159,7 @@ class ChannelModel(qc.QAbstractTableModel):
             else:
                 value = getattr(self.channels[row], key)
 
-            if value == data.default:
+            if not data.always_show and value == data.default:
                 return ""
             if key == "wav_path" and role == Qt.ItemDataRole.DisplayRole:
                 if Path(value).parent != Path():

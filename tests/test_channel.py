@@ -1,11 +1,11 @@
 from contextlib import ExitStack
 from typing import Optional, List
+from unittest.mock import patch
 
 import hypothesis.strategies as hs
 import numpy as np
 import pytest
 from hypothesis import given
-from unittest.mock import patch
 
 import corrscope.channel
 import corrscope.corrscope
@@ -142,7 +142,7 @@ def test_config_channel_integration(
 
     # Inspect arguments to renderer.update_main_lines()
     datas: List[RenderInput]
-    (datas,), kwargs = renderer.update_main_lines.call_args
+    (datas, *args), kwargs = renderer.update_main_lines.call_args
     render_inputs = datas[0]
     assert len(render_inputs.data) == channel._render_samp
 

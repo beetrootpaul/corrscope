@@ -6,6 +6,17 @@
 - Add support for background images (#388, @Sanqui)
 - Add support for line outlines (#388, @Sanqui)
 
+### Major Changes
+
+- Rewrite the trigger algorithm to enhance determinism (#403)
+    - Triggering still makes mistakes, especially when DC offset varies within a frame (eg. NES 75% pulse changing volumes). This may be addressed in the future.
+    - Changed default triggering settings as well.
+
+### Changelog
+
+- Fix passing absolute .wav paths into corrscope CLI (#398)
+- Fix preview error when clearing "Trigger/Render Width" table cells (#407)
+
 ## 0.7.1
 
 ### Major Changes

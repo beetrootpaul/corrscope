@@ -2,9 +2,9 @@ import warnings
 from typing import Sequence
 
 import numpy as np
-from numpy.testing import assert_allclose
 import pytest
 from delayed_assert import expect, assert_expectations
+from numpy.testing import assert_allclose
 
 from corrscope.config import CorrError
 from corrscope.utils.scipy.wavfile import WavFileWarning
@@ -112,8 +112,8 @@ def test_stereo_merge():
     nsamp = 2000
 
     # [-1, 1) from [-32768..32768)
-    int16_step = (1 - -1) / (2 ** 16)
-    assert int16_step == 2 ** -15
+    int16_step = (1 - -1) / (2**16)
+    assert int16_step == 2**-15
 
     # Check wave indexing dimensions.
     assert wave[0].shape == ()
